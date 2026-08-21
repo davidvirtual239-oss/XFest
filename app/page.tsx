@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { TopBar } from "@/components/site/top-bar";
 import { MainNav } from "@/components/site/main-nav";
 import { Hero } from "@/components/site/hero";
-import { CategoryGrid } from "@/components/site/category-grid";
+import { UpcomingEvents } from "@/components/site/upcoming-events";
 import { SiteFooter } from "@/components/site/site-footer";
 
 /**
@@ -21,7 +21,7 @@ export default function HomePage() {
       <main id="contenido">
         <Hero />
         <MainNav />
-        <CategoryGrid />
+        <UpcomingEvents />
       </main>
 
       <SiteFooter />
