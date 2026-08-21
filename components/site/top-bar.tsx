@@ -24,7 +24,7 @@ export async function TopBar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3" aria-label="Fiesta Maestra — inicio">
           <Image
-            src="/logo-xfest.jpg"
+            src="/images/logo-xfest.jpg"
             alt=""
             width={44}
             height={44}
