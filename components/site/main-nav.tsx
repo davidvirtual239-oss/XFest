@@ -4,14 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+/** Solo rutas que existen: cada link nuevo entra cuando su pagina esta hecha. */
 const LINKS = [
   { href: "/", label: "Inicio" },
-  { href: "/temas", label: "Temas" },
-  { href: "/servicios", label: "Servicios" },
-  { href: "/proveedores", label: "Proveedores" },
-  { href: "/galeria", label: "Galería" },
-  { href: "/contacto", label: "Contacto" },
-  { href: "/nosotros", label: "Nosotros" },
+  { href: "/eventos", label: "Eventos" },
+  { href: "/crear-evento", label: "Crear evento" },
 ];
 
 export function MainNav() {

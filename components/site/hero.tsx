@@ -49,10 +49,10 @@ export function Hero() {
               </Link>
             </Button>
             <Link
-              href="/proveedores"
+              href="/eventos"
               className="text-xs tracking-brand text-cream-100 uppercase underline-offset-8 transition-colors hover:text-gold-300 hover:underline"
             >
-              Ver proveedores
+              Ver eventos
             </Link>
           </div>
         </div>

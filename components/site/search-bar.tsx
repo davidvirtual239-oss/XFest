@@ -43,8 +43,8 @@ export function SearchBar({ className }: { className?: string }) {
           name="q"
           type="search"
           autoComplete="off"
-          aria-label="Buscar tu fiesta ideal"
-          placeholder="TU FIESTA IDEAL, FÁCIL Y RÁPIDA"
+          aria-label="Buscar eventos"
+          placeholder="BUSCA UN EVENTO CERCA DE TI"
           className="h-9 border-0 px-2 text-[13px] tracking-[0.08em] uppercase shadow-none"
         />
 

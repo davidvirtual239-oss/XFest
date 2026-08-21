@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { UserRound, Heart } from "lucide-react";
+import { UserRound } from "lucide-react";
 import { SearchBar } from "@/components/site/search-bar";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
@@ -44,17 +44,11 @@ export async function TopBar() {
 
         {/* Accesos de usuario */}
         <div className="flex items-center gap-1 sm:gap-2">
-          <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex">
-            <Link href="/favoritos" aria-label="Favoritos">
-              <Heart className="size-4" />
-            </Link>
-          </Button>
-
           {user ? (
             <Button variant="outline" size="sm" asChild>
-              <Link href="/panel">
+              <Link href="/crear-evento">
                 <UserRound className="size-4" />
-                <span className="hidden sm:inline">Mi panel</span>
+                <span className="hidden sm:inline">Crear evento</span>
               </Link>
             </Button>
           ) : (
