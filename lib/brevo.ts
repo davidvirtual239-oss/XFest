@@ -16,9 +16,10 @@ export async function enviarTicket(p: {
     method: "POST",
     headers: { "api-key": key, "Content-Type": "application/json" },
     body: JSON.stringify({
-      sender: { name: "Fiesta Maestra", email: "tickets@fiestamaestra.cl" },
+      // OJO: el dominio del remitente debe estar verificado en Brevo antes de enviar.
+      sender: { name: "XFest", email: "tickets@fiestamaestra.cl" },
       to: [{ email: p.email }],
-      subject: "Tu ticket de Fiesta Maestra",
+      subject: "Tu ticket de XFest",
       htmlContent: `<p>Pago confirmado por $${p.montoClp.toLocaleString("es-CL")} CLP.</p>
                     <p>Orden: <b>${p.ordenId}</b></p>`,
       tags: ["ticket"],

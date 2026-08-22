@@ -12,8 +12,8 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: "Fiesta Maestra — Tu fiesta ideal, fácil y rápida",
-    template: "%s · Fiesta Maestra",
+    default: "XFest — Tu fiesta ideal, fácil y rápida",
+    template: "%s · XFest",
   },
   description:
     "Organiza fiestas infantiles, eventos corporativos, bodas y graduaciones con proveedores verificados en Chile.",

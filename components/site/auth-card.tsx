@@ -27,13 +27,13 @@ export function AuthCard({ modo, next }: { modo: keyof typeof COPY; next: string
       className="flex min-h-dvh items-center justify-center bg-cream-100 px-6 py-16"
     >
       <div className="w-full max-w-md animate-rise rounded-[var(--radius-card)] bg-white p-8 shadow-lift sm:p-10">
-        <Link href="/" className="mx-auto block w-fit" aria-label="Fiesta Maestra — inicio">
+        <Link href="/" className="mx-auto block w-fit" aria-label="XFest — inicio">
           <Image
-            src="/images/logo-xfest.jpg"
+            src="/images/logo-xfest.png"
             alt=""
-            width={56}
-            height={56}
-            className="size-14 rounded-full object-cover"
+            width={128}
+            height={128}
+            className="size-16 object-contain"
           />
         </Link>
 

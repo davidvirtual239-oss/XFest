@@ -22,18 +22,21 @@ export async function TopBar() {
     <header className="sticky top-0 z-50 w-full border-b border-cream-200 bg-cream-50/90 backdrop-blur-md">
       <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-3 sm:gap-8 sm:px-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3" aria-label="Fiesta Maestra — inicio">
+        <Link
+          href="/"
+          aria-label="XFest — inicio"
+          className="group flex items-center gap-2.5 rounded-full outline-none focus-visible:ring-[3px] focus-visible:ring-gold-500/40"
+        >
           <Image
-            src="/images/logo-xfest.jpg"
+            src="/images/logo-xfest.png"
             alt=""
-            width={44}
-            height={44}
+            width={96}
+            height={96}
             priority
-            className="size-10 rounded-full object-cover sm:size-11"
+            className="size-11 object-contain transition-transform duration-500 ease-brand group-hover:scale-105 sm:size-12"
           />
-          <span className="hidden leading-none sm:block">
-            <span className="block font-display text-lg text-ink-900">Fiesta</span>
-            <span className="block text-[10px] tracking-brand text-gold-700 uppercase">Maestra</span>
+          <span className="hidden font-display text-2xl leading-none tracking-tight text-ink-900 sm:block">
+            <span className="text-gold-600">X</span>Fest
           </span>
         </Link>
 
