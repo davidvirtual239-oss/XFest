@@ -10,17 +10,17 @@ export async function UpcomingEvents() {
   return (
     <section id="eventos" className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
       <header className="mb-10 text-center">
-        <p className="text-[10px] tracking-brand text-gold-700 uppercase">Agenda</p>
-        <h2 className="mt-3 font-display text-3xl text-ink-900 sm:text-4xl">
+        <p className="text-[10px] tracking-brand text-gold-400 uppercase">Agenda</p>
+        <h2 className="mt-3 font-display text-3xl text-cream-50 sm:text-4xl">
           Eventos disponibles próximamente
         </h2>
         <div className="rule-gold mx-auto mt-5 h-px w-24" aria-hidden />
       </header>
 
       {eventos.length === 0 ? (
-        <div className="mx-auto max-w-md rounded-[var(--radius-card)] bg-white p-10 text-center shadow-soft">
+        <div className="mx-auto max-w-md rounded-[var(--radius-card)] bg-ink-900 p-10 text-center shadow-soft">
           <PartyPopper className="mx-auto size-7 text-gold-600" aria-hidden />
-          <p className="mt-4 text-sm text-ink-700">
+          <p className="mt-4 text-sm text-cream-200">
             Todavía no hay eventos publicados. Sé la primera persona en crear uno.
           </p>
           <Button size="sm" asChild className="mt-6">

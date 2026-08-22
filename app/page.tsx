@@ -14,7 +14,7 @@ import { SiteFooter } from "@/components/site/site-footer";
 export default function HomePage() {
   return (
     <>
-      <Suspense fallback={<div className="h-[68px] border-b border-cream-200 bg-cream-50" />}>
+      <Suspense fallback={<div className="h-[68px] border-b border-ink-800 bg-ink-950" />}>
         <TopBar />
       </Suspense>
 

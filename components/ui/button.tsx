@@ -8,13 +8,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // Unico elemento solido dorado de la pantalla: es LA accion principal.
         default:
           "bg-gradient-to-b from-gold-400 to-gold-600 text-ink-950 shadow-gold hover:from-gold-300 hover:to-gold-500 hover:-translate-y-0.5 active:translate-y-0",
         outline:
-          "border border-gold-500/60 bg-transparent text-ink-900 hover:bg-gold-500/10 hover:border-gold-500",
-        ghost: "text-ink-700 hover:bg-cream-100 hover:text-ink-950",
-        link: "text-gold-700 underline-offset-4 hover:underline",
-        dark: "bg-ink-900 text-cream-50 hover:bg-ink-950",
+          "border border-gold-500/50 bg-transparent text-gold-400 hover:border-gold-500 hover:bg-gold-500/10 hover:text-gold-300",
+        ghost: "text-cream-200 hover:bg-ink-800 hover:text-cream-50",
+        link: "text-gold-400 underline-offset-4 hover:text-gold-300 hover:underline",
+        // Secundario neutro: sobre fondo oscuro se define por el borde, no por el relleno.
+        dark: "border border-white/12 bg-ink-800 text-cream-50 hover:border-white/20 hover:bg-ink-700",
       },
       size: {
         default: "h-11 px-6",

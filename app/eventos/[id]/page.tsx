@@ -36,11 +36,11 @@ function Dato({
   valor: string;
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl bg-white p-4 shadow-soft">
+    <div className="flex items-start gap-3 rounded-2xl bg-ink-900 p-4 shadow-soft">
       <Icono className="mt-0.5 size-5 shrink-0 text-gold-600" aria-hidden />
       <div className="min-w-0">
-        <p className="text-[10px] tracking-brand text-ink-500 uppercase">{etiqueta}</p>
-        <p className="mt-1 text-sm text-ink-900 first-letter:uppercase">{valor}</p>
+        <p className="text-[10px] tracking-brand text-cream-400 uppercase">{etiqueta}</p>
+        <p className="mt-1 text-sm text-cream-50 first-letter:uppercase">{valor}</p>
       </div>
     </div>
   );
@@ -53,11 +53,11 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
 
   return (
     <>
-      <Suspense fallback={<div className="h-[68px] border-b border-cream-200 bg-cream-50" />}>
+      <Suspense fallback={<div className="h-[68px] border-b border-ink-800 bg-ink-950" />}>
         <TopBar />
       </Suspense>
 
-      <main id="contenido" className="bg-cream-100 pb-20">
+      <main id="contenido" className="bg-ink-950 pb-20">
         <section className="relative isolate h-[clamp(18rem,44vh,26rem)] overflow-hidden">
           <Image
             src={evento.portada_url}
@@ -98,20 +98,20 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
           </div>
 
           {evento.descripcion && (
-            <section className="animate-rise rounded-[var(--radius-card)] bg-white p-6 shadow-soft sm:p-10">
-              <h2 className="font-display text-2xl text-ink-900">Sobre el evento</h2>
+            <section className="animate-rise rounded-[var(--radius-card)] bg-ink-900 p-6 shadow-soft sm:p-10">
+              <h2 className="font-display text-2xl text-cream-50">Sobre el evento</h2>
               <div className="rule-gold mt-4 h-px w-16" aria-hidden />
-              <p className="mt-6 text-sm leading-relaxed whitespace-pre-line text-ink-700">
+              <p className="mt-6 text-sm leading-relaxed whitespace-pre-line text-cream-200">
                 {evento.descripcion}
               </p>
             </section>
           )}
 
           <section className="mt-10">
-            <h2 className="font-display text-2xl text-ink-900">Dónde será</h2>
+            <h2 className="font-display text-2xl text-cream-50">Dónde será</h2>
             <div className="rule-gold mt-4 h-px w-16" aria-hidden />
             {evento.direccion && (
-              <p className="mt-6 flex items-start gap-2 text-sm text-ink-700">
+              <p className="mt-6 flex items-start gap-2 text-sm text-cream-200">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-gold-600" aria-hidden />
                 {evento.direccion}
               </p>

@@ -34,8 +34,8 @@ export function SearchBar({ className }: { className?: string }) {
     <form action={formAction} className={cn("w-full", className)}>
       <div
         className={cn(
-          "group flex h-11 items-center gap-1 rounded-full border bg-white/90 pr-1 pl-4 shadow-soft backdrop-blur transition-colors",
-          state.ok ? "border-cream-200 focus-within:border-gold-500" : "border-red-400"
+          "group flex h-11 items-center gap-1 rounded-full border bg-ink-900/90 pr-1 pl-4 shadow-soft backdrop-blur transition-colors",
+          state.ok ? "border-ink-800 focus-within:border-gold-500" : "border-red-400"
         )}
       >
         <Search className="size-4 shrink-0 text-gold-600" aria-hidden />
@@ -55,7 +55,7 @@ export function SearchBar({ className }: { className?: string }) {
           title={coords ? "Ubicación activada" : "Buscar cerca de mí"}
           className={cn(
             "grid size-8 place-items-center rounded-full transition-colors",
-            coords ? "text-gold-600" : "text-ink-500 hover:text-gold-600"
+            coords ? "text-gold-600" : "text-cream-400 hover:text-gold-600"
           )}
         >
           <MapPin className="size-4" />
@@ -65,7 +65,7 @@ export function SearchBar({ className }: { className?: string }) {
           type="submit"
           disabled={pending}
           aria-label="Buscar"
-          className="grid size-9 place-items-center rounded-full bg-gradient-to-b from-gold-400 to-gold-600 text-ink-950 shadow-gold transition-transform hover:scale-105 active:scale-95 disabled:opacity-60"
+          className="grid size-9 place-items-center rounded-full bg-gradient-to-b from-gold-400 to-gold-600 text-cream-50 shadow-gold transition-transform hover:scale-105 active:scale-95 disabled:opacity-60"
         >
           {pending ? (
             <LoaderCircle className="size-4 animate-spin" />

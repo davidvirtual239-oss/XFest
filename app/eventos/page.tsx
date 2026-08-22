@@ -40,21 +40,21 @@ export default async function EventosPage({
 
   return (
     <>
-      <Suspense fallback={<div className="h-[68px] border-b border-cream-200 bg-cream-50" />}>
+      <Suspense fallback={<div className="h-[68px] border-b border-ink-800 bg-ink-950" />}>
         <TopBar />
       </Suspense>
 
-      <main id="contenido" className="bg-cream-100 pb-20">
+      <main id="contenido" className="bg-ink-950 pb-20">
         <MainNav />
 
         <div className="mx-auto max-w-7xl px-6 pt-14 sm:px-10">
           <header className="mb-10 text-center">
-            <p className="text-[10px] tracking-brand text-gold-700 uppercase">Agenda</p>
-            <h1 className="mt-3 font-display text-3xl text-ink-900 sm:text-4xl">
+            <p className="text-[10px] tracking-brand text-gold-400 uppercase">Agenda</p>
+            <h1 className="mt-3 font-display text-3xl text-cream-50 sm:text-4xl">
               {params.q ? `Resultados para “${params.q}”` : "Todos los eventos"}
             </h1>
             {params.lat != null && (
-              <p className="mt-3 text-sm text-ink-500">
+              <p className="mt-3 text-sm text-cream-400">
                 A menos de {params.radioKm} km de tu ubicación
               </p>
             )}
@@ -62,11 +62,11 @@ export default async function EventosPage({
           </header>
 
           {eventos.length === 0 ? (
-            <div className="mx-auto max-w-md rounded-[var(--radius-card)] bg-white p-10 text-center shadow-soft">
+            <div className="mx-auto max-w-md rounded-[var(--radius-card)] bg-ink-900 p-10 text-center shadow-soft">
               {filtrando ? (
                 <>
                   <SearchX className="mx-auto size-7 text-gold-600" aria-hidden />
-                  <p className="mt-4 text-sm text-ink-700">
+                  <p className="mt-4 text-sm text-cream-200">
                     No encontramos eventos con esos filtros. Probá con otra búsqueda
                     o ampliá la zona.
                   </p>
@@ -77,7 +77,7 @@ export default async function EventosPage({
               ) : (
                 <>
                   <PartyPopper className="mx-auto size-7 text-gold-600" aria-hidden />
-                  <p className="mt-4 text-sm text-ink-700">
+                  <p className="mt-4 text-sm text-cream-200">
                     Todavía no hay eventos publicados. Sé la primera persona en crear uno.
                   </p>
                   <Button size="sm" asChild className="mt-6">
@@ -108,7 +108,7 @@ export default async function EventosPage({
                   </Link>
                 </Button>
               )}
-              <span className="text-xs tracking-brand text-ink-500 uppercase">
+              <span className="text-xs tracking-brand text-cream-400 uppercase">
                 Página {params.page}
               </span>
               {eventos.length === RESULTADOS_POR_PAGINA && (

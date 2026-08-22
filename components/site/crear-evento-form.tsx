@@ -39,7 +39,7 @@ function Campo({
 }
 
 const INPUT_CAJA =
-  "h-11 rounded-full border border-cream-200 bg-white focus:border-gold-500 transition-colors";
+  "h-11 rounded-full border border-ink-800 bg-ink-950 focus:border-gold-500 transition-colors";
 
 export function CrearEventoForm() {
   const [estado, formAction, pendiente] = useActionState(crearEventoAction, ESTADO_INICIAL);
@@ -125,9 +125,9 @@ export function CrearEventoForm() {
             step={1}
             disabled={sinLimite}
             placeholder="Ej: 100"
-            className={`${INPUT_CAJA} disabled:bg-cream-100`}
+            className={`${INPUT_CAJA} disabled:bg-ink-800`}
           />
-          <label className="mt-3 flex cursor-pointer items-center gap-2 text-sm text-ink-700">
+          <label className="mt-3 flex cursor-pointer items-center gap-2 text-sm text-cream-200">
             <Checkbox
               name="sinLimiteCapacidad"
               checked={sinLimite}
@@ -143,7 +143,7 @@ export function CrearEventoForm() {
         <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-start">
           <label
             htmlFor="portada"
-            className="flex h-40 w-full cursor-pointer items-center justify-center overflow-hidden rounded-[var(--radius-card)] border border-dashed border-cream-200 bg-white transition-colors hover:border-gold-500 sm:w-64"
+            className="flex h-40 w-full cursor-pointer items-center justify-center overflow-hidden rounded-[var(--radius-card)] border border-dashed border-ink-800 bg-ink-900 transition-colors hover:border-gold-500 sm:w-64"
           >
             {preview ? (
               <Image
@@ -155,7 +155,7 @@ export function CrearEventoForm() {
                 className="size-full object-cover"
               />
             ) : (
-              <span className="flex flex-col items-center gap-2 text-xs text-ink-500">
+              <span className="flex flex-col items-center gap-2 text-xs text-cream-400">
                 <ImagePlus className="size-6" aria-hidden />
                 JPG, PNG o WEBP · máx. 8 MB
               </span>
@@ -174,7 +174,7 @@ export function CrearEventoForm() {
         {e?.portada?.[0] && <p className="mt-1.5 text-xs text-red-700">{e.portada[0]}</p>}
       </section>
 
-      <div className="flex flex-wrap items-center gap-4 border-t border-cream-200 pt-8">
+      <div className="flex flex-wrap items-center gap-4 border-t border-ink-800 pt-8">
         <Button type="submit" size="lg" disabled={pendiente}>
           {pendiente && <LoaderCircle className="size-4 animate-spin" />}
           Publicar evento

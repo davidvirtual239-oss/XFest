@@ -19,7 +19,7 @@ export async function TopBar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-cream-200 bg-cream-50/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-ink-800 bg-ink-950/90 backdrop-blur-md">
       <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-3 sm:gap-8 sm:px-6">
         {/* Logo */}
         <Link
@@ -28,14 +28,14 @@ export async function TopBar() {
           className="group flex items-center gap-2.5 rounded-full outline-none focus-visible:ring-[3px] focus-visible:ring-gold-500/40"
         >
           <Image
-            src="/images/logo-xfest.png"
+            src="/images/logo-xfest-ondark.png"
             alt=""
             width={96}
             height={96}
             priority
             className="size-11 object-contain transition-transform duration-500 ease-brand group-hover:scale-105 sm:size-12"
           />
-          <span className="hidden font-display text-2xl leading-none tracking-tight text-ink-900 sm:block">
+          <span className="hidden font-display text-2xl leading-none tracking-tight text-cream-50 sm:block">
             <span className="text-gold-600">X</span>Fest
           </span>
         </Link>

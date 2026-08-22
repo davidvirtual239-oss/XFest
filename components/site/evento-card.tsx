@@ -21,7 +21,7 @@ export function EventoCard({ evento }: { evento: EventoCardData }) {
   const href = `/eventos/${evento.id}`;
 
   return (
-    <Card className="group h-full ring-1 ring-cream-200 transition-all duration-500 ease-brand hover:-translate-y-1.5 hover:shadow-lift hover:ring-gold-500/40">
+    <Card className="group h-full ring-1 ring-ink-800 transition-all duration-500 ease-brand hover:-translate-y-1.5 hover:shadow-lift hover:ring-gold-500/40">
       <Link href={href} className="relative block aspect-4/3 overflow-hidden">
         <Image
           src={evento.portada_url}
