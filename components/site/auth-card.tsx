@@ -29,7 +29,7 @@ export function AuthCard({ modo, next }: { modo: keyof typeof COPY; next: string
       <div className="w-full max-w-md animate-rise rounded-[var(--radius-card)] bg-white p-8 shadow-lift sm:p-10">
         <Link href="/" className="mx-auto block w-fit" aria-label="Fiesta Maestra — inicio">
           <Image
-            src="/logo-xfest.jpg"
+            src="/images/logo-xfest.jpg"
             alt=""
             width={56}
             height={56}
