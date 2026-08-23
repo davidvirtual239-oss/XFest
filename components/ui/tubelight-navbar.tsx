@@ -34,10 +34,11 @@ export function NavBar({ items, className }: NavBarProps) {
   const pathname = usePathname();
   const reducirMovimiento = useReducedMotion();
 
+  // Sin fallback a items[0]: en una ruta que no esta en el menu (p. ej.
+  // /mis-eventos) no debe quedar ninguna pestana encendida.
   const activo =
     items.find((i) => i.url !== "/" && pathname.startsWith(i.url))?.name ??
-    items.find((i) => i.url === pathname)?.name ??
-    items[0]?.name;
+    items.find((i) => i.url === pathname)?.name;
 
   return (
     <nav aria-label="Navegación principal" className={cn("flex justify-center", className)}>

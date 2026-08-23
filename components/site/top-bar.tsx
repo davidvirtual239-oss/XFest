@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { UserMenu } from "@/components/site/user-menu";
 import { createClient } from "@/lib/supabase/server";
 
 /** Server Component: lee la sesion en el servidor, sin flash de "iniciar sesion". */
@@ -42,12 +43,21 @@ export async function TopBar() {
         {/* Accesos de usuario */}
         <div className="flex items-center gap-1 sm:gap-2">
           {user ? (
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/crear-evento">
-                <UserRound className="size-4" />
-                <span className="hidden sm:inline">Crear evento</span>
-              </Link>
-            </Button>
+            <UserMenu
+              user={{
+                // Google entrega estos campos en user_metadata; el correo es el respaldo.
+                name:
+                  (user.user_metadata?.full_name as string | undefined) ??
+                  (user.user_metadata?.name as string | undefined) ??
+                  user.email?.split("@")[0] ??
+                  "Mi cuenta",
+                email: user.email ?? "",
+                avatarUrl:
+                  (user.user_metadata?.avatar_url as string | undefined) ??
+                  (user.user_metadata?.picture as string | undefined) ??
+                  null,
+              }}
+            />
           ) : (
             <>
               <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">

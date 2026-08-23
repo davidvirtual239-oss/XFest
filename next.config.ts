@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
         ? [{ protocol: "https" as const, hostname: supabaseHost, pathname: "/storage/v1/object/public/**" }]
         : []),
       { protocol: "https" as const, hostname: "images.unsplash.com" },
+      // Avatares de Google (OAuth); sin esto next/image los rechaza
+      { protocol: "https" as const, hostname: "lh3.googleusercontent.com" },
     ],
   },
   experimental: {
