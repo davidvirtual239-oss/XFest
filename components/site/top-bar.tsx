@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { UserRound } from "lucide-react";
-import { SearchBar } from "@/components/site/search-bar";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 
@@ -20,7 +19,7 @@ export async function TopBar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-ink-800 bg-ink-950/90 backdrop-blur-md">
-      <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-3 sm:gap-8 sm:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         {/* Logo */}
         <Link
           href="/"
@@ -39,11 +38,6 @@ export async function TopBar() {
             <span className="text-gold-600">X</span>Fest
           </span>
         </Link>
-
-        {/* Buscador central */}
-        <div className="mx-auto w-full max-w-xl">
-          <SearchBar />
-        </div>
 
         {/* Accesos de usuario */}
         <div className="flex items-center gap-1 sm:gap-2">

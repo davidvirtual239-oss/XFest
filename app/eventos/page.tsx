@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SearchX, PartyPopper } from "lucide-react";
 import { TopBar } from "@/components/site/top-bar";
 import { MainNav } from "@/components/site/main-nav";
+import { SearchBand } from "@/components/site/search-band";
 import { SiteFooter } from "@/components/site/site-footer";
 import { EventoCard } from "@/components/site/evento-card";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ export default async function EventosPage({
 
       <main id="contenido" className="bg-ink-950 pb-20">
         <MainNav />
+        <SearchBand />
 
         <div className="mx-auto max-w-7xl px-6 pt-14 sm:px-10">
           <header className="mb-10 text-center">
