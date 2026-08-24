@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
   const res = await fetch(url, {
     headers: {
-      "User-Agent": "FiestaMaestra/1.0 (https://fiestamaestra.cl)",
+      "User-Agent": "XFest/1.0 (https://xfest.cl)",
       "Accept-Language": "es",
     },
     next: { revalidate: 3600 },
