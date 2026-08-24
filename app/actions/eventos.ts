@@ -25,6 +25,7 @@ export type EventoCard = {
   hora_inicio: string;
   direccion: string | null;
   portada_url: string;
+  precio_clp?: number;
 };
 
 export type Evento = EventoCard & {
@@ -127,7 +128,7 @@ export async function listarEventosProximos(limite = 8): Promise<EventoCard[]> {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("eventos")
-      .select("id, nombre, fecha, hora_inicio, direccion, portada_url")
+      .select("id, nombre, fecha, hora_inicio, direccion, portada_url, precio_clp")
       .gte("fecha", new Date().toLocaleDateString("en-CA"))
       .order("fecha", { ascending: true })
       .order("hora_inicio", { ascending: true })
