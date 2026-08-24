@@ -168,9 +168,11 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
                 <ValoracionForm eventoId={evento.id} actual={valoracion} />
               ) : (
                 <p className="rounded-card border border-ink-800 bg-ink-900 p-8 text-center text-sm text-cream-400">
-                  {user
-                    ? "Podrás valorar esta fiesta cuando termine, si confirmaste asistencia."
-                    : "Inicia sesión y confirma asistencia para poder valorar esta fiesta."}
+                  {!user
+                    ? "Inicia sesión y confirma asistencia para poder valorar esta fiesta."
+                    : user.id === evento.owner_id
+                      ? "Esta fiesta es tuya: la valoran quienes asisten."
+                      : "Podrás valorar esta fiesta cuando termine, si confirmaste asistencia."}
                 </p>
               )}
             </div>

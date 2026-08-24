@@ -28,6 +28,7 @@ export type EventoCard = {
 };
 
 export type Evento = EventoCard & {
+  owner_id: string;
   descripcion: string | null;
   hora_termino: string;
   lat: number;
@@ -147,7 +148,7 @@ export async function obtenerEvento(id: string): Promise<Evento | null> {
   const { data, error } = await supabase
     .from("eventos")
     .select(
-      "id, nombre, descripcion, fecha, hora_inicio, hora_termino, lat, lng, direccion, portada_url, capacidad, precio_clp"
+      "id, owner_id, nombre, descripcion, fecha, hora_inicio, hora_termino, lat, lng, direccion, portada_url, capacidad, precio_clp"
     )
     .eq("id", id)
     .maybeSingle();
