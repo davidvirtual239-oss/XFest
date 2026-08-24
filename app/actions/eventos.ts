@@ -25,9 +25,11 @@ export type EventoCard = {
   hora_inicio: string;
   direccion: string | null;
   portada_url: string;
+  precio_clp?: number;
 };
 
 export type Evento = EventoCard & {
+  owner_id: string;
   descripcion: string | null;
   hora_termino: string;
   lat: number;
@@ -141,7 +143,7 @@ export async function listarEventosProximos(limite = 8): Promise<EventoCard[]> {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("eventos")
-      .select("id, nombre, fecha, hora_inicio, direccion, portada_url")
+      .select("id, nombre, fecha, hora_inicio, direccion, portada_url, precio_clp")
       .gte("fecha", new Date().toLocaleDateString("en-CA"))
       .order("fecha", { ascending: true })
       .order("hora_inicio", { ascending: true })
@@ -162,7 +164,7 @@ export async function obtenerEvento(id: string): Promise<Evento | null> {
   const { data, error } = await supabase
     .from("eventos")
     .select(
-      "id, nombre, descripcion, fecha, hora_inicio, hora_termino, lat, lng, direccion, portada_url, capacidad, precio_clp"
+      "id, owner_id, nombre, descripcion, fecha, hora_inicio, hora_termino, lat, lng, direccion, portada_url, capacidad, precio_clp"
     )
     .eq("id", id)
     .maybeSingle();
@@ -186,7 +188,7 @@ export async function obtenerEventoPropio(id: string): Promise<Evento | null> {
   const { data, error } = await supabase
     .from("eventos")
     .select(
-      "id, nombre, descripcion, fecha, hora_inicio, hora_termino, lat, lng, direccion, portada_url, capacidad, precio_clp"
+      "id, owner_id, nombre, descripcion, fecha, hora_inicio, hora_termino, lat, lng, direccion, portada_url, capacidad, precio_clp"
     )
     .eq("id", id)
     .eq("owner_id", user.id)

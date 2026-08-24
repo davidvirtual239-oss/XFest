@@ -4,13 +4,14 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { CalendarCheck, PlusCircle, Compass, LogOut, ChevronDown } from "lucide-react";
+import { UserRound, CalendarCheck, PlusCircle, Compass, LogOut, ChevronDown } from "lucide-react";
 import { UserProfileSidebar, type MenuNavItem, type UserProfile } from "@/components/ui/menu";
 import { cerrarSesion } from "@/app/actions/auth";
 import { cn } from "@/lib/utils";
 
 /** Solo rutas que existen: un menu que lleva a 404 es peor que no tenerlo. */
 const ITEMS: MenuNavItem[] = [
+  { label: "Mi perfil", href: "/perfil", icon: <UserRound className="h-full w-full" /> },
   { label: "Mis eventos", href: "/mis-eventos", icon: <CalendarCheck className="h-full w-full" /> },
   { label: "Crear evento", href: "/crear-evento", icon: <PlusCircle className="h-full w-full" /> },
   {

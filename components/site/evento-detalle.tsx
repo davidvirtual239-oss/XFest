@@ -3,7 +3,9 @@ import Image from "next/image";
 import { CalendarDays, Clock, MapPin, Users, Ticket } from "lucide-react";
 import { MapaVista } from "@/components/site/mapa";
 import { Button } from "@/components/ui/button";
+import { EstrellasLectura } from "@/components/ui/estrellas";
 import type { Evento } from "@/app/actions/eventos";
+import type { Reputacion } from "@/app/actions/valoraciones";
 import { fechaLarga, hora } from "@/lib/formato-evento";
 import { hoyISO } from "@/lib/validation/eventos";
 import { CLP } from "@/lib/utils";
@@ -32,15 +34,25 @@ function Dato({
  * Ficha publica del evento. La reusa el organizador desde su panel para ver
  * exactamente lo que ve el resto; ahi `previsualizacion` apaga el CTA, que
  * en su caso no lleva a ninguna parte.
+ *
+ * Lo que depende de quien mira (asistencia, valoraciones) entra por slots en
+ * vez de resolverse aca dentro: asi la vista previa del organizador queda
+ * estatica sin duplicar el layout.
  */
 export function EventoDetalle({
   evento,
   inscritos,
   previsualizacion = false,
+  reputacion,
+  asistencia,
+  valoraciones,
 }: {
   evento: Evento;
   inscritos: number;
   previsualizacion?: boolean;
+  reputacion?: Reputacion;
+  asistencia?: React.ReactNode;
+  valoraciones?: React.ReactNode;
 }) {
   const termino = evento.fecha < hoyISO();
   const disponibles = evento.capacidad != null ? evento.capacidad - inscritos : null;
@@ -69,6 +81,11 @@ export function EventoDetalle({
           <h1 className="mt-3 max-w-3xl text-balance-title font-display text-3xl leading-tight text-cream-50 sm:text-5xl">
             {evento.nombre}
           </h1>
+          {reputacion && reputacion.total > 0 && (
+            <div className="mt-3">
+              <EstrellasLectura valor={reputacion.promedio} total={reputacion.total} size={16} />
+            </div>
+          )}
         </div>
       </section>
 
@@ -132,6 +149,10 @@ export function EventoDetalle({
           )}
         </section>
 
+        {asistencia && (
+          <div className="mt-6 rounded-card border border-ink-800 bg-ink-900 p-6">{asistencia}</div>
+        )}
+
         {evento.descripcion && (
           <section className="animate-rise mt-10 rounded-[var(--radius-card)] bg-ink-900 p-6 shadow-soft sm:p-10">
             <h2 className="font-display text-2xl text-cream-50">Sobre el evento</h2>
@@ -155,6 +176,14 @@ export function EventoDetalle({
             <MapaVista lat={evento.lat} lng={evento.lng} />
           </div>
         </section>
+
+        {valoraciones && (
+          <section className="mt-14">
+            <h2 className="font-display text-2xl text-cream-50">Valoraciones</h2>
+            <div className="rule-gold mt-4 h-px w-16" aria-hidden />
+            <div className="mt-6">{valoraciones}</div>
+          </section>
+        )}
       </div>
     </>
   );
