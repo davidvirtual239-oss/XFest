@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { ArrowRight, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { EventoCard } from "@/components/site/evento-card";
+import { EventosCoverflow } from "@/components/site/eventos-coverflow";
 import { listarEventosProximos } from "@/app/actions/eventos";
 
 export async function UpcomingEvents() {
   const eventos = await listarEventosProximos(8);
 
   return (
-    <section id="eventos" className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-      <header className="mb-10 text-center">
+    <section id="eventos" className="overflow-hidden py-16 sm:py-20">
+      <header className="mb-6 px-6 text-center">
         <p className="text-[10px] tracking-brand text-gold-400 uppercase">Agenda</p>
         <h2 className="mt-3 font-display text-3xl text-cream-50 sm:text-4xl">
           Eventos disponibles próximamente
@@ -29,13 +29,7 @@ export async function UpcomingEvents() {
         </div>
       ) : (
         <>
-          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {eventos.map((ev, i) => (
-              <li key={ev.id} className="animate-rise" style={{ animationDelay: `${i * 90}ms` }}>
-                <EventoCard evento={ev} />
-              </li>
-            ))}
-          </ul>
+          <EventosCoverflow eventos={eventos} />
 
           <div className="mt-12 flex justify-center">
             <Button variant="outline" asChild>

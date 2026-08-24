@@ -9,6 +9,16 @@ import { MapaVista } from "@/components/site/mapa";
 import { obtenerEvento } from "@/app/actions/eventos";
 import { fechaLarga, hora } from "@/lib/formato-evento";
 import { CLP } from "@/lib/utils";
+import { AsistenciaBotones } from "@/components/site/asistencia-botones";
+import { ValoracionForm } from "@/components/site/valoracion-form";
+import { EstrellasLectura } from "@/components/ui/estrellas";
+import { obtenerAsistencia, contarAsistentes } from "@/app/actions/asistencias";
+import {
+  miValoracion,
+  puedeValorar,
+  reputacionEvento,
+} from "@/app/actions/valoraciones";
+import { createClient } from "@/lib/supabase/server";
 
 export async function generateMetadata({
   params,
@@ -51,6 +61,20 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
   const evento = await obtenerEvento(id);
   if (!evento) notFound();
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Consultas independientes: en paralelo.
+  const [asistencia, asistentes, reputacion, valoracion, habilitado] = await Promise.all([
+    obtenerAsistencia(evento.id),
+    contarAsistentes(evento.id),
+    reputacionEvento(evento.id),
+    miValoracion(evento.id),
+    puedeValorar(evento.id),
+  ]);
+
   return (
     <>
       <Suspense fallback={<div className="h-[68px] border-b border-ink-800 bg-ink-950" />}>
@@ -76,6 +100,11 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
             <h1 className="mt-3 max-w-3xl text-balance-title font-display text-3xl leading-tight text-cream-50 sm:text-5xl">
               {evento.nombre}
             </h1>
+            {reputacion.total > 0 && (
+              <div className="mt-3">
+                <EstrellasLectura valor={reputacion.promedio} total={reputacion.total} size={16} />
+              </div>
+            )}
           </div>
         </section>
 
@@ -94,6 +123,15 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
               icono={Users}
               etiqueta="Cupos"
               valor={evento.capacidad ? `${evento.capacidad} personas` : "Sin límite"}
+            />
+          </div>
+
+          <div className="mb-10 rounded-card border border-ink-800 bg-ink-900 p-6">
+            <AsistenciaBotones
+              eventoId={evento.id}
+              inicial={asistencia}
+              autenticado={Boolean(user)}
+              confirmados={asistentes.confirmados}
             />
           </div>
 
@@ -118,6 +156,25 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
             )}
             <div className="mt-6">
               <MapaVista lat={evento.lat} lng={evento.lng} />
+            </div>
+          </section>
+
+          <section className="mt-14">
+            <h2 className="font-display text-2xl text-cream-50">Valoraciones</h2>
+            <div className="rule-gold mt-4 h-px w-16" aria-hidden />
+
+            <div className="mt-6">
+              {habilitado || valoracion ? (
+                <ValoracionForm eventoId={evento.id} actual={valoracion} />
+              ) : (
+                <p className="rounded-card border border-ink-800 bg-ink-900 p-8 text-center text-sm text-cream-400">
+                  {!user
+                    ? "Inicia sesión y confirma asistencia para poder valorar esta fiesta."
+                    : user.id === evento.owner_id
+                      ? "Esta fiesta es tuya: la valoran quienes asisten."
+                      : "Podrás valorar esta fiesta cuando termine, si confirmaste asistencia."}
+                </p>
+              )}
             </div>
           </section>
         </div>

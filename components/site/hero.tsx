@@ -9,8 +9,8 @@ export function Hero() {
     <section className="relative isolate overflow-hidden">
       {/* Imagen de fondo */}
       <Image
-        src="https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=1920&q=80"
-        alt="Celebración con luces y guirnaldas"
+        src="/images/hero-fiesta.webp"
+        alt=""
         fill
         priority
         sizes="100vw"
