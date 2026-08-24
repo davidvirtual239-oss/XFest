@@ -108,8 +108,8 @@ export function AsistenciaBotones({
             Aforo completo · {cupos.confirmados} de {cupos.capacidad}
           </span>
         ) : (
-          `${cupos.confirmados} de ${cupos.capacidad} · quedan ${cupos.disponibles} ${
-            cupos.disponibles === 1 ? "cupo" : "cupos"
+          `${cupos.confirmados} de ${cupos.capacidad} · ${
+            cupos.disponibles === 1 ? "queda 1 cupo" : `quedan ${cupos.disponibles} cupos`
           }`
         )}
       </p>

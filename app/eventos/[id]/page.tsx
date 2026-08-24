@@ -126,7 +126,7 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
                 cupos.capacidad === null
                   ? "Sin límite"
                   : cupos.agotado
-                    ? `Agotado · ${cupos.capacidad} personas`
+                    ? `Agotado · ${cupos.capacidad} ${cupos.capacidad === 1 ? "persona" : "personas"}`
                     : `${cupos.disponibles} de ${cupos.capacidad} disponibles`
               }
             />

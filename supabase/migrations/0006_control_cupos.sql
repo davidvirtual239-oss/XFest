@@ -25,8 +25,18 @@ begin
     return new;
   end if;
 
-  -- Ya estaba confirmado: es una reedicion de la misma fila, no suma.
-  if tg_op = 'UPDATE' and old.estado = 'confirmado' then
+  -- Esta persona ya ocupa un cupo: reeditar su fila no consume otro.
+  --
+  -- Se consulta la tabla en vez de mirar OLD porque un upsert es
+  -- INSERT ... ON CONFLICT: el trigger dispara primero como INSERT, con
+  -- TG_OP = 'INSERT' y OLD nulo, ANTES de resolver el conflicto. Mirar
+  -- solo TG_OP dejaba fuera ese caso y rechazaba a quien ya estaba dentro.
+  if exists (
+    select 1 from public.asistencias
+    where evento_id = new.evento_id
+      and user_id   = new.user_id
+      and estado    = 'confirmado'
+  ) then
     return new;
   end if;
 
