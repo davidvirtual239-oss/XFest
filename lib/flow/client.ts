@@ -49,6 +49,36 @@ export async function flowPost<T>(
   return (await res.json()) as T;
 }
 
+type FlowPagoCreado = { token: string; url: string; flowOrder: number };
+
+/**
+ * Crea el cobro en Flow y devuelve la URL a la que hay que mandar al pagador.
+ *
+ * `urlConfirmation` es la unica fuente de verdad del pago (webhook servidor a
+ * servidor); `urlReturn` solo trae de vuelta al navegador y por eso nunca
+ * decide si la inscripcion queda confirmada.
+ */
+export async function crearPago(p: {
+  commerceOrder: string;
+  subject: string;
+  amountClp: number;
+  email: string;
+}): Promise<{ redirectUrl: string; flowOrder: number }> {
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+  const res = await flowPost<FlowPagoCreado>("/payment/create", {
+    commerceOrder: p.commerceOrder,
+    subject: p.subject.slice(0, 120),
+    currency: "CLP",
+    amount: p.amountClp,
+    email: p.email,
+    urlConfirmation: `${base}/api/webhooks/flow`,
+    urlReturn: `${base}/api/pagos/retorno`,
+  });
+
+  return { redirectUrl: `${res.url}?token=${res.token}`, flowOrder: res.flowOrder };
+}
+
 export type FlowStatus = {
   flowOrder: number;
   commerceOrder: string;

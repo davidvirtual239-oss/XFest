@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CalendarPlus } from "lucide-react";
+import { CalendarPlus, CheckCircle2 } from "lucide-react";
 import { TopBar } from "@/components/site/top-bar";
 import { MainNav } from "@/components/site/main-nav";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -12,7 +12,12 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Mis eventos" };
 
-export default async function MisEventosPage() {
+export default async function MisEventosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ eliminado?: string }>;
+}) {
+  const { eliminado } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -32,6 +37,20 @@ export default async function MisEventosPage() {
 
   const eventos = (data ?? []) as EventoCardData[];
 
+  // Un solo viaje para los contadores de todas las tarjetas.
+  const inscritosPorEvento = new Map<string, number>();
+  if (eventos.length > 0) {
+    const { data: filas } = await supabase
+      .from("inscripciones")
+      .select("evento_id")
+      .in("evento_id", eventos.map((e) => e.id))
+      .neq("estado", "cancelada");
+
+    for (const fila of filas ?? []) {
+      inscritosPorEvento.set(fila.evento_id, (inscritosPorEvento.get(fila.evento_id) ?? 0) + 1);
+    }
+  }
+
   return (
     <>
       <Suspense fallback={<div className="h-[68px] border-b border-ink-800 bg-ink-950" />}>
@@ -42,6 +61,16 @@ export default async function MisEventosPage() {
         <MainNav />
 
         <div className="mx-auto max-w-7xl px-6 pt-14 sm:px-10">
+          {eliminado && (
+            <p
+              role="status"
+              className="mx-auto mb-10 flex max-w-md items-center gap-2 rounded-full bg-ink-900 px-5 py-3 text-sm text-cream-200 shadow-soft"
+            >
+              <CheckCircle2 className="size-4 shrink-0 text-emerald-400" aria-hidden />
+              El evento se eliminó junto con sus inscripciones.
+            </p>
+          )}
+
           <header className="mb-10 text-center">
             <p className="text-[10px] tracking-brand text-gold-400 uppercase">Tu cuenta</p>
             <h1 className="mt-3 font-display text-3xl text-cream-50 sm:text-4xl">Mis eventos</h1>
@@ -74,7 +103,12 @@ export default async function MisEventosPage() {
                   className="animate-rise"
                   style={{ animationDelay: `${i * 60}ms` }}
                 >
-                  <EventoCard evento={evento} />
+                  <EventoCard
+                    evento={evento}
+                    href={`/mis-eventos/${evento.id}`}
+                    cta="Administrar"
+                    inscritos={inscritosPorEvento.get(evento.id) ?? 0}
+                  />
                 </li>
               ))}
             </ul>

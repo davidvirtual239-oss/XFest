@@ -3,6 +3,8 @@ import Image from "next/image";
 import { UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/site/user-menu";
+import { CampanaNotificaciones } from "@/components/site/campana-notificaciones";
+import { listarNotificaciones } from "@/app/actions/notificaciones";
 import { createClient } from "@/lib/supabase/server";
 
 /** Server Component: lee la sesion en el servidor, sin flash de "iniciar sesion". */
@@ -17,6 +19,8 @@ export async function TopBar() {
       user = null;
     }
   }
+
+  const avisos = user ? await listarNotificaciones() : { items: [], sinLeer: 0 };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-ink-800 bg-ink-950/90 backdrop-blur-md">
@@ -43,21 +47,27 @@ export async function TopBar() {
         {/* Accesos de usuario */}
         <div className="flex items-center gap-1 sm:gap-2">
           {user ? (
-            <UserMenu
-              user={{
-                // Google entrega estos campos en user_metadata; el correo es el respaldo.
-                name:
-                  (user.user_metadata?.full_name as string | undefined) ??
-                  (user.user_metadata?.name as string | undefined) ??
-                  user.email?.split("@")[0] ??
-                  "Mi cuenta",
-                email: user.email ?? "",
-                avatarUrl:
-                  (user.user_metadata?.avatar_url as string | undefined) ??
-                  (user.user_metadata?.picture as string | undefined) ??
-                  null,
-              }}
-            />
+            <>
+              <CampanaNotificaciones
+                notificaciones={avisos.items}
+                sinLeer={avisos.sinLeer}
+              />
+              <UserMenu
+                user={{
+                  // Google entrega estos campos en user_metadata; el correo es el respaldo.
+                  name:
+                    (user.user_metadata?.full_name as string | undefined) ??
+                    (user.user_metadata?.name as string | undefined) ??
+                    user.email?.split("@")[0] ??
+                    "Mi cuenta",
+                  email: user.email ?? "",
+                  avatarUrl:
+                    (user.user_metadata?.avatar_url as string | undefined) ??
+                    (user.user_metadata?.picture as string | undefined) ??
+                    null,
+                }}
+              />
+            </>
           ) : (
             <>
               <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">

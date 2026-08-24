@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { TopBar } from "@/components/site/top-bar";
 import { SiteFooter } from "@/components/site/site-footer";
-import { CrearEventoForm } from "@/components/site/crear-evento-form";
+import { EventoForm } from "@/components/site/evento-form";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Crea tu evento" };
@@ -33,7 +33,7 @@ export default async function CrearEventoPage() {
           </header>
 
           <div className="animate-rise rounded-[var(--radius-card)] bg-ink-900 p-6 shadow-soft sm:p-10">
-            <CrearEventoForm />
+            <EventoForm />
           </div>
         </div>
       </main>

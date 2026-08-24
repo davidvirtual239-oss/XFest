@@ -59,7 +59,7 @@ export async function POST(req: Request) {
       .eq("commerce_order", status.commerceOrder)
       .eq("monto_clp", Number(status.amount))     // el monto debe calzar con el nuestro
       .in("estado", ["pendiente"])                // no re-procesar una orden cerrada
-      .select("id, email, monto_clp")
+      .select("id, email, monto_clp, evento_id")
       .maybeSingle();
 
     if (error) throw error;
@@ -70,11 +70,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, sin_cambios: true });
     }
 
+    // La inscripcion sigue al pago: confirmada libera el ticket, rechazada o
+    // anulada devuelve el cupo al evento. El aviso al organizador lo dispara
+    // el trigger de la tabla al pasar a 'confirmada'.
+    if (nuevoEstado !== "pendiente") {
+      const { error: inscError } = await supabase
+        .from("inscripciones")
+        .update({ estado: nuevoEstado === "pagada" ? "confirmada" : "cancelada" })
+        .eq("orden_id", orden.id);
+
+      if (inscError) throw inscError;
+    }
+
     if (nuevoEstado === "pagada") {
+      const { data: evento } = orden.evento_id
+        ? await supabase.from("eventos").select("nombre").eq("id", orden.evento_id).maybeSingle()
+        : { data: null };
+
       await enviarTicket({
         email: orden.email,
         ordenId: orden.id,
         montoClp: orden.monto_clp,
+        evento: evento?.nombre ?? null,
       });
     }
 

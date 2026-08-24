@@ -32,16 +32,25 @@ export function MapaVista({ lat, lng }: { lat: number; lng: number }) {
  * Selector: click en el mapa o busqueda de direccion. Escribe el resultado en
  * inputs ocultos para que viaje en el FormData del Server Action.
  */
-export function MapaSelector() {
-  const [punto, setPunto] = useState<Punto | null>(null);
-  const [direccion, setDireccion] = useState("");
-  const [consulta, setConsulta] = useState("");
+export function MapaSelector({
+  inicial,
+}: {
+  /** Ubicacion ya guardada, al editar un evento. */
+  inicial?: { lat: number; lng: number; direccion: string };
+}) {
+  const [punto, setPunto] = useState<Punto | null>(
+    inicial ? { lat: inicial.lat, lng: inicial.lng } : null
+  );
+  const [direccion, setDireccion] = useState(inicial?.direccion ?? "");
+  const [consulta, setConsulta] = useState(inicial?.direccion ?? "");
   const [sugerencias, setSugerencias] = useState<Sugerencia[]>([]);
   const [buscando, setBuscando] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    if (consulta.trim().length < 3) {
+    // Cuando el texto ya es la direccion elegida (al montar en modo edicion, o
+    // justo despues de tocar una sugerencia) no hay nada que volver a buscar.
+    if (consulta === direccion || consulta.trim().length < 3) {
       setSugerencias([]);
       return;
     }
@@ -62,7 +71,7 @@ export function MapaSelector() {
       }
     }, 450);
     return () => clearTimeout(t);
-  }, [consulta]);
+  }, [consulta, direccion]);
 
   function elegir(s: Sugerencia) {
     setPunto({ lat: s.lat, lng: s.lng });
