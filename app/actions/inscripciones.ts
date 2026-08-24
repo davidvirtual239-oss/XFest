@@ -245,10 +245,23 @@ export async function listarParticipantes(eventoId: string): Promise<Participant
   return (data ?? []) as Participante[];
 }
 
-/** Cupos tomados (incluye los pendientes de pago): RPC publico. */
-export async function contarInscritos(eventoId: string): Promise<number> {
+export type Conteo = {
+  /** Cupos tomados: incluye a los que estan pendientes de pago. */
+  inscritos: number;
+  /** Gente que va de verdad: pago confirmado, o evento gratis. */
+  confirmados: number;
+};
+
+/**
+ * Los dos numeros de la ficha, via RPC publico (no expone la lista).
+ * `inscritos` es el que descuenta cupos; `confirmados`, el que se muestra
+ * como asistencia real.
+ */
+export async function contarInscritos(eventoId: string): Promise<Conteo> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("evento_inscritos", { p_evento_id: eventoId });
-  if (error) return 0;
-  return data ?? 0;
+  if (error) return { inscritos: 0, confirmados: 0 };
+
+  const fila = (Array.isArray(data) ? data[0] : data) as Conteo | null;
+  return fila ?? { inscritos: 0, confirmados: 0 };
 }

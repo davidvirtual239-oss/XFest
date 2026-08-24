@@ -40,7 +40,7 @@ export default async function AdministrarEventoPage({
   const evento = await obtenerEventoPropio(id);
   if (!evento) notFound();
 
-  const inscritos = await contarInscritos(id);
+  const conteo = await contarInscritos(id);
 
   return (
     <>
@@ -74,7 +74,7 @@ export default async function AdministrarEventoPage({
               <div>
                 <h1 className="font-display text-2xl text-cream-50">{evento.nombre}</h1>
                 <p className="mt-1 text-sm text-cream-400">
-                  {inscritos} {inscritos === 1 ? "persona inscrita" : "personas inscritas"}
+                  {conteo.confirmados} {conteo.confirmados === 1 ? "persona inscrita" : "personas inscritas"}
                 </p>
               </div>
 
@@ -97,10 +97,12 @@ export default async function AdministrarEventoPage({
                     Ver publicado
                   </Link>
                 </Button>
+                {/* Aca va el total, no solo las confirmadas: el borrado se
+                    lleva tambien las que estan pendientes de pago. */}
                 <EliminarEventoModal
                   eventoId={id}
                   nombre={evento.nombre}
-                  inscritos={inscritos}
+                  inscritos={conteo.inscritos}
                 />
               </div>
             </div>
@@ -111,7 +113,7 @@ export default async function AdministrarEventoPage({
           Así ven tu evento las personas
         </p>
 
-        <EventoDetalle evento={evento} inscritos={inscritos} previsualizacion />
+        <EventoDetalle evento={evento} conteo={conteo} previsualizacion />
       </main>
 
       <SiteFooter />

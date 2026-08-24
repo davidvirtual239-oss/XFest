@@ -10,7 +10,7 @@ import { InscripcionForm } from "@/components/site/inscripcion-form";
 import { Button } from "@/components/ui/button";
 import { obtenerEvento } from "@/app/actions/eventos";
 import { contarInscritos, datosPrellenados } from "@/app/actions/inscripciones";
-import { fechaLarga, hora } from "@/lib/formato-evento";
+import { fechaLarga, horario } from "@/lib/formato-evento";
 import { hoyISO } from "@/lib/validation/eventos";
 import { CLP } from "@/lib/utils";
 
@@ -41,11 +41,11 @@ export default async function InscribirsePage({ params }: { params: Promise<{ id
   const evento = await obtenerEvento(id);
   if (!evento) notFound();
 
-  const [inscritos, datos] = await Promise.all([contarInscritos(id), datosPrellenados()]);
+  const [conteo, datos] = await Promise.all([contarInscritos(id), datosPrellenados()]);
 
-  const termino = evento.fecha < hoyISO();
-  const agotado = evento.capacidad != null && inscritos >= evento.capacidad;
-  const disponibles = evento.capacidad != null ? evento.capacidad - inscritos : null;
+  const termino = evento.fecha_termino < hoyISO();
+  const agotado = evento.capacidad != null && conteo.inscritos >= evento.capacidad;
+  const disponibles = evento.capacidad != null ? evento.capacidad - conteo.inscritos : null;
 
   return (
     <>
@@ -116,7 +116,7 @@ export default async function InscribirsePage({ params }: { params: Promise<{ id
                   </div>
                   <div className="flex items-start gap-2.5 text-cream-200">
                     <Clock className="mt-0.5 size-4 shrink-0 text-gold-600" aria-hidden />
-                    {hora(evento.hora_inicio)} a {hora(evento.hora_termino)} h
+                    {horario(evento.fecha, evento.hora_inicio, evento.fecha_termino, evento.hora_termino)}
                   </div>
                   {evento.direccion && (
                     <div className="flex items-start gap-2.5 text-cream-200">

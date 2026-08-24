@@ -25,3 +25,18 @@ export function fechaCorta(fecha: string): string {
 export function hora(valor: string): string {
   return valor.slice(0, 5);
 }
+
+/**
+ * Horario del evento. Cuando cruza la medianoche la hora sola miente
+ * ("22:00 a 04:00" se lee como un evento de 18 horas al reves), asi que se
+ * nombra el dia en que cierra.
+ */
+export function horario(
+  fecha: string,
+  horaInicio: string,
+  fechaTermino: string,
+  horaTermino: string
+): string {
+  const tramo = `${hora(horaInicio)} a ${hora(horaTermino)} h`;
+  return fechaTermino === fecha ? tramo : `${tramo} del ${fechaCorta(fechaTermino)}`;
+}
