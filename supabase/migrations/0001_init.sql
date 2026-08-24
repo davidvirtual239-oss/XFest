@@ -1,5 +1,5 @@
 -- ============================================================
--- FIESTA MAESTRA — esquema base + PostGIS + RLS
+-- XFEST — esquema base + PostGIS + RLS
 -- ============================================================
 -- Script IDEMPOTENTE: se puede re-ejecutar completo sin errores.
 -- (El editor SQL de Supabase NO revierte el script si una sentencia

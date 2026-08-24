@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
   experimental: {
     // Server Actions solo aceptan peticiones desde estos origenes (anti-CSRF)
     serverActions: {
-      allowedOrigins: ["localhost:3000", "localhost:3001", "fiestamaestra.cl"],
+      allowedOrigins: ["localhost:3000", "localhost:3001", "xfest.cl"],
       bodySizeLimit: "10mb",   // la portada del evento viaja dentro del FormData
     },
   },
