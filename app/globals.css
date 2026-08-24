@@ -1,26 +1,34 @@
 @import "tailwindcss";
 
 /* ============================================================
-   FIESTA MAESTRA — Tailwind v4 CSS-first config (@theme)
-   Paleta: off-white / grafito / dorado-bronce (segun logo neon)
+   XFest — Tailwind v4 CSS-first config (@theme)
+   Paleta: negro calido + dorado, tomada del logo neon.
+   Regla: el dorado es ACENTO, no superficie. Se gana el ojo
+   por escasez; si se usa en bloques grandes se abarata.
    ============================================================ */
 
 @theme {
-  /* --- Marca --- */
-  --color-cream-50:  oklch(0.985 0.006 85);   /* fondo base off-white */
-  --color-cream-100: oklch(0.968 0.010 85);
-  --color-cream-200: oklch(0.938 0.014 85);
+  /* --- Superficies (ramp oscuro con matiz calido) --- */
+  --color-ink-950: oklch(0.145 0.006 70);   /* fondo de pagina */
+  --color-ink-900: oklch(0.190 0.008 70);   /* card / superficie elevada */
+  --color-ink-800: oklch(0.240 0.009 70);   /* hover, chips */
+  --color-ink-700: oklch(0.310 0.010 70);   /* borde visible */
+  --color-ink-600: oklch(0.400 0.010 70);   /* divisor fuerte */
+  --color-ink-500: oklch(0.520 0.010 70);   /* iconos apagados */
 
-  --color-ink-500: oklch(0.520 0.008 60);     /* texto secundario */
-  --color-ink-700: oklch(0.360 0.010 60);
-  --color-ink-900: oklch(0.205 0.008 60);     /* titulares grafito */
-  --color-ink-950: oklch(0.145 0.006 60);
+  /* --- Texto (ramp claro, calido para no chocar con el dorado) --- */
+  --color-cream-50:  oklch(0.965 0.006 85); /* texto primario */
+  --color-cream-100: oklch(0.905 0.008 85);
+  --color-cream-200: oklch(0.820 0.009 85); /* texto secundario */
+  --color-cream-400: oklch(0.660 0.010 80); /* texto atenuado */
 
-  --color-gold-300: oklch(0.885 0.090 85);    /* highlight neon */
-  --color-gold-400: oklch(0.830 0.120 82);
-  --color-gold-500: oklch(0.760 0.140 78);    /* CTA principal */
-  --color-gold-600: oklch(0.665 0.130 72);    /* CTA hover */
-  --color-gold-700: oklch(0.545 0.110 66);    /* bronce / bordes */
+  /* --- Dorado --- */
+  --color-gold-300: oklch(0.900 0.085 88);  /* highlight / hover de link */
+  --color-gold-400: oklch(0.845 0.115 84);
+  --color-gold-500: oklch(0.780 0.140 80);  /* CTA principal */
+  --color-gold-600: oklch(0.690 0.135 74);  /* CTA hover */
+  --color-gold-700: oklch(0.560 0.110 68);  /* bronce: SOLO bordes/relleno, no texto
+                                               (sobre oscuro da 4.15:1) */
 
   /* --- Tipografia --- */
   --font-display: var(--font-playfair), Georgia, "Times New Roman", serif;
@@ -31,10 +39,11 @@
   /* --- Radios --- */
   --radius-card: 1.25rem;
 
-  /* --- Sombras --- */
-  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.04), 0 8px 24px -12px oklch(0 0 0 / 0.18);
-  --shadow-lift: 0 2px 4px oklch(0 0 0 / 0.05), 0 24px 48px -20px oklch(0 0 0 / 0.28);
-  --shadow-gold: 0 10px 30px -10px oklch(0.760 0.140 78 / 0.55);
+  /* --- Sombras: en oscuro casi no se leen, la profundidad la da
+         el borde. Se mantienen suaves y se suma el glow dorado. --- */
+  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.40), 0 10px 28px -14px oklch(0 0 0 / 0.65);
+  --shadow-lift: 0 2px 6px oklch(0 0 0 / 0.50), 0 28px 56px -22px oklch(0 0 0 / 0.80);
+  --shadow-gold: 0 10px 32px -12px oklch(0.780 0.140 80 / 0.45);
 
   /* --- Animacion --- */
   --animate-rise: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -46,22 +55,24 @@
   to   { opacity: 1; transform: none; }
 }
 
-/* --- Tokens shadcn/ui mapeados a la marca (light-first) --- */
+/* --- Tokens shadcn/ui mapeados a la marca (dark-first) --- */
 :root {
-  --background: var(--color-cream-50);
-  --foreground: var(--color-ink-900);
-  --card: oklch(1 0 0);
-  --card-foreground: var(--color-ink-900);
+  color-scheme: dark;
+
+  --background: var(--color-ink-950);
+  --foreground: var(--color-cream-50);
+  --card: var(--color-ink-900);
+  --card-foreground: var(--color-cream-50);
   --primary: var(--color-gold-500);
-  --primary-foreground: oklch(0.16 0.01 60);
-  --secondary: var(--color-cream-100);
-  --secondary-foreground: var(--color-ink-900);
-  --muted: var(--color-cream-100);
-  --muted-foreground: var(--color-ink-500);
-  --accent: var(--color-gold-300);
-  --accent-foreground: var(--color-ink-950);
-  --border: oklch(0.905 0.012 85);
-  --input: oklch(0.905 0.012 85);
+  --primary-foreground: oklch(0.16 0.010 70);   /* texto casi negro sobre dorado */
+  --secondary: var(--color-ink-800);
+  --secondary-foreground: var(--color-cream-50);
+  --muted: var(--color-ink-800);
+  --muted-foreground: var(--color-cream-400);
+  --accent: var(--color-gold-400);
+  --accent-foreground: oklch(0.16 0.010 70);
+  --border: oklch(1 0 0 / 0.10);                /* hairline translucido */
+  --input: oklch(1 0 0 / 0.14);
   --ring: var(--color-gold-500);
   --radius: 0.75rem;
 }
@@ -108,4 +119,39 @@
     var(--color-gold-500) 82%,
     transparent
   );
+}
+
+/* ============================================================
+   Leaflet: los estilos por defecto asumen fondo claro.
+   Se alinean con la paleta oscura sin tocar el JS del mapa.
+   ============================================================ */
+.leaflet-container {
+  background: var(--color-ink-900);          /* mientras cargan los tiles */
+  font-family: var(--font-sans);
+}
+
+.leaflet-control-attribution {
+  background: color-mix(in oklab, var(--color-ink-950) 82%, transparent) !important;
+  color: var(--color-cream-400) !important;
+  backdrop-filter: blur(4px);
+}
+.leaflet-control-attribution a { color: var(--color-gold-400) !important; }
+
+.leaflet-bar,
+.leaflet-bar a {
+  background-color: var(--color-ink-900);
+  color: var(--color-cream-100);
+  border-color: oklch(1 0 0 / 0.12);
+}
+.leaflet-bar a:hover {
+  background-color: var(--color-ink-800);
+  color: var(--color-gold-300);
+}
+
+/* El popup por defecto es blanco puro: rompe el tema. */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--color-ink-900);
+  color: var(--color-cream-50);
+  box-shadow: var(--shadow-lift);
 }

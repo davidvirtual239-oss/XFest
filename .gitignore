@@ -3,3 +3,5 @@ node_modules
 .env*.local
 .vercel
 *.tsbuildinfo
+supabase/.temp
+auto-pull.log

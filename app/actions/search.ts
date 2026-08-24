@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import {
   searchSchema,
   searchParamsToQueryString,
+  RESULTADOS_POR_PAGINA,
   type SearchParams,
 } from "@/lib/validation/search";
 import { createClient } from "@/lib/supabase/server";
@@ -16,11 +17,18 @@ export type SearchState = {
   fieldErrors?: Record<string, string[]>;
 };
 
-/**
- * Server Action del buscador del Top Bar.
- * Valida -> normaliza -> redirige a /buscar?<qs> (URL como estado compartible).
- * La consulta real vive en el Server Component de /buscar, cacheable por URL.
- */
+export type EventoResultado = {
+  id: string;
+  nombre: string;
+  fecha: string;
+  hora_inicio: string;
+  direccion: string | null;
+  portada_url: string;
+  precio_clp: number;
+  capacidad: number | null;
+  distancia_km: number | null;
+};
+
 export async function buscarAction(
   _prev: SearchState,
   formData: FormData
@@ -32,7 +40,6 @@ export async function buscarAction(
 
   const parsed = searchSchema.safeParse({
     q: formData.get("q") ?? "",
-    categoria: formData.get("categoria") || undefined,
     lat: formData.get("lat") || undefined,
     lng: formData.get("lng") || undefined,
     radioKm: formData.get("radioKm") || undefined,
@@ -46,25 +53,20 @@ export async function buscarAction(
     };
   }
 
-  if (!parsed.data.q && !parsed.data.categoria) {
-    return { ok: false, error: "Escribe que fiesta quieres o elige una categoria." };
-  }
-
-  redirect(`/buscar?${searchParamsToQueryString(parsed.data)}`);
+  const qs = searchParamsToQueryString(parsed.data);
+  redirect(qs ? `/eventos?${qs}` : "/eventos");
 }
 
-/** Consulta PostGIS usada por el Server Component de /buscar. */
-export async function buscarProveedores(params: SearchParams) {
+export async function buscarEventos(params: SearchParams): Promise<EventoResultado[]> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.rpc("buscar_proveedores", {
+  const { data, error } = await supabase.rpc("buscar_eventos", {
     p_query: params.q || null,
-    p_categoria: params.categoria ?? null,
     p_lat: params.lat ?? null,
     p_lng: params.lng ?? null,
     p_radio_m: params.radioKm * 1000,
-    p_limit: 12,
-    p_offset: (params.page - 1) * 12,
+    p_limit: RESULTADOS_POR_PAGINA,
+    p_offset: (params.page - 1) * RESULTADOS_POR_PAGINA,
   });
 
   if (error) throw new Error(`Busqueda fallida: ${error.message}`);
