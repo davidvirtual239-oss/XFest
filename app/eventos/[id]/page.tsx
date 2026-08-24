@@ -12,7 +12,7 @@ import { CLP } from "@/lib/utils";
 import { AsistenciaBotones } from "@/components/site/asistencia-botones";
 import { ValoracionForm } from "@/components/site/valoracion-form";
 import { EstrellasLectura } from "@/components/ui/estrellas";
-import { obtenerAsistencia, contarAsistentes } from "@/app/actions/asistencias";
+import { obtenerAsistencia, obtenerCupos } from "@/app/actions/asistencias";
 import {
   miValoracion,
   puedeValorar,
@@ -67,9 +67,9 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
   } = await supabase.auth.getUser();
 
   // Consultas independientes: en paralelo.
-  const [asistencia, asistentes, reputacion, valoracion, habilitado] = await Promise.all([
+  const [asistencia, cupos, reputacion, valoracion, habilitado] = await Promise.all([
     obtenerAsistencia(evento.id),
-    contarAsistentes(evento.id),
+    obtenerCupos(evento.id),
     reputacionEvento(evento.id),
     miValoracion(evento.id),
     puedeValorar(evento.id),
@@ -122,7 +122,13 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
             <Dato
               icono={Users}
               etiqueta="Cupos"
-              valor={evento.capacidad ? `${evento.capacidad} personas` : "Sin límite"}
+              valor={
+                cupos.capacidad === null
+                  ? "Sin límite"
+                  : cupos.agotado
+                    ? `Agotado · ${cupos.capacidad} personas`
+                    : `${cupos.disponibles} de ${cupos.capacidad} disponibles`
+              }
             />
           </div>
 
@@ -131,7 +137,7 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
               eventoId={evento.id}
               inicial={asistencia}
               autenticado={Boolean(user)}
-              confirmados={asistentes.confirmados}
+              cupos={cupos}
             />
           </div>
 

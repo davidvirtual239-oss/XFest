@@ -5,18 +5,19 @@ import { useRouter } from "next/navigation";
 import { Bookmark, BookmarkCheck, Check, LoaderCircle } from "lucide-react";
 import { marcarAsistencia } from "@/app/actions/asistencias";
 import type { EstadoAsistencia } from "@/lib/validation/asistencias";
+import type { Cupos } from "@/app/actions/asistencias";
 import { cn } from "@/lib/utils";
 
 export function AsistenciaBotones({
   eventoId,
   inicial,
   autenticado,
-  confirmados,
+  cupos,
 }: {
   eventoId: string;
   inicial: EstadoAsistencia | null;
   autenticado: boolean;
-  confirmados: number;
+  cupos: Cupos;
 }) {
   const [estado, setEstado] = useState<EstadoAsistencia | null>(inicial);
   const [pendiente, iniciar] = useTransition();
@@ -47,6 +48,8 @@ export function AsistenciaBotones({
 
   const voy = estado === "confirmado";
   const guardado = estado === "guardado";
+  // Quien ya confirmo ocupa un cupo: para esa persona nunca esta agotado.
+  const sinCupo = cupos.agotado && !voy;
 
   return (
     <div className="space-y-2">
@@ -54,14 +57,17 @@ export function AsistenciaBotones({
         <button
           type="button"
           onClick={() => cambiar("confirmado")}
-          disabled={pendiente}
+          disabled={pendiente || sinCupo}
           aria-pressed={voy}
+          title={sinCupo ? "Aforo completo" : undefined}
           className={cn(
             "inline-flex h-11 items-center gap-2 rounded-full px-6 text-sm font-medium transition-all duration-300 ease-brand outline-none",
             "focus-visible:ring-[3px] focus-visible:ring-gold-500/40 disabled:opacity-60",
             voy
               ? "bg-gradient-to-b from-gold-400 to-gold-600 text-ink-950 shadow-gold"
-              : "border border-gold-500/50 text-gold-300 hover:border-gold-500 hover:bg-gold-500/10"
+              : sinCupo
+                ? "cursor-not-allowed border border-ink-700 text-cream-400"
+                : "border border-gold-500/50 text-gold-300 hover:border-gold-500 hover:bg-gold-500/10"
           )}
         >
           {pendiente ? (
@@ -69,7 +75,7 @@ export function AsistenciaBotones({
           ) : voy ? (
             <Check className="size-4" />
           ) : null}
-          {voy ? "Voy a ir" : "Confirmar asistencia"}
+          {voy ? "Voy a ir" : sinCupo ? "Aforo completo" : "Confirmar asistencia"}
         </button>
 
         <button
@@ -93,10 +99,18 @@ export function AsistenciaBotones({
       <p className="text-xs text-cream-400" aria-live="polite">
         {error ? (
           <span className="text-red-400">{error}</span>
-        ) : confirmados > 0 ? (
-          `${confirmados} ${confirmados === 1 ? "persona confirmó" : "personas confirmaron"} asistencia`
+        ) : cupos.capacidad === null ? (
+          cupos.confirmados > 0
+            ? `${cupos.confirmados} ${cupos.confirmados === 1 ? "persona confirmó" : "personas confirmaron"} asistencia`
+            : "Sé el primero en confirmar"
+        ) : cupos.agotado ? (
+          <span className="text-gold-300">
+            Aforo completo · {cupos.confirmados} de {cupos.capacidad}
+          </span>
         ) : (
-          "Sé el primero en confirmar"
+          `${cupos.confirmados} de ${cupos.capacidad} · quedan ${cupos.disponibles} ${
+            cupos.disponibles === 1 ? "cupo" : "cupos"
+          }`
         )}
       </p>
     </div>

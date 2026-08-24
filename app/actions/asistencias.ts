@@ -36,7 +36,13 @@ export async function marcarAsistencia(
       { user_id: user.id, evento_id: parsed.data.eventoId, estado: parsed.data.estado },
       { onConflict: "user_id,evento_id" }
     );
-    if (error) return { ok: false, error: "No pudimos guardar tu asistencia." };
+    if (error) {
+      // El trigger de aforo aborta la transaccion con este mensaje.
+      if (error.message?.includes("AFORO_COMPLETO")) {
+        return { ok: false, error: "Esta fiesta ya llegó a su aforo." };
+      }
+      return { ok: false, error: "No pudimos guardar tu asistencia." };
+    }
   }
 
   revalidatePath(`/eventos/${parsed.data.eventoId}`);
@@ -62,14 +68,30 @@ export async function obtenerAsistencia(eventoId: string): Promise<EstadoAsisten
   return (data?.estado as EstadoAsistencia) ?? null;
 }
 
-/** Conteo público de asistentes. Sale de la vista agregada, no de la tabla. */
-export async function contarAsistentes(eventoId: string) {
+export type Cupos = {
+  capacidad: number | null;
+  confirmados: number;
+  /** null = sin limite declarado. */
+  disponibles: number | null;
+  agotado: boolean;
+};
+
+/**
+ * Aforo publico del evento. Sale de la vista agregada, nunca de la tabla:
+ * las asistencias son privadas, el numero no.
+ */
+export async function obtenerCupos(eventoId: string): Promise<Cupos> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("eventos_asistentes")
-    .select("confirmados, guardados")
+    .from("eventos_cupos")
+    .select("capacidad, confirmados, disponibles, agotado")
     .eq("evento_id", eventoId)
     .maybeSingle();
 
-  return { confirmados: data?.confirmados ?? 0, guardados: data?.guardados ?? 0 };
+  return {
+    capacidad: data?.capacidad ?? null,
+    confirmados: data?.confirmados ?? 0,
+    disponibles: data?.disponibles ?? null,
+    agotado: data?.agotado ?? false,
+  };
 }
