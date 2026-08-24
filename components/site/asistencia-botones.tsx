@@ -94,9 +94,11 @@ export function AsistenciaBotones({
         {error ? (
           <span className="text-red-400">{error}</span>
         ) : confirmados > 0 ? (
-          `${confirmados} ${confirmados === 1 ? "persona confirmó" : "personas confirmaron"} asistencia`
+          // "Marcaron que van" y no "confirmaron asistencia": el registro real
+          // es la inscripcion, que se muestra aparte con su propio conteo.
+          `${confirmados} ${confirmados === 1 ? "persona marcó" : "personas marcaron"} que va`
         ) : (
-          "Sé el primero en confirmar"
+          "Marca si piensas ir. Para asegurar tu cupo, inscríbete."
         )}
       </p>
     </div>
