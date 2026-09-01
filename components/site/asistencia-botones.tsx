@@ -7,16 +7,22 @@ import { marcarAsistencia } from "@/app/actions/asistencias";
 import type { EstadoAsistencia } from "@/lib/validation/asistencias";
 import { cn } from "@/lib/utils";
 
+/**
+ * Senal blanda de interes: guardar la fiesta o avisar que piensas ir.
+ *
+ * NO lleva la cuenta de asistentes — esa la manda la inscripcion, que es la
+ * que toma cupo, cobra y arma la lista del organizador. Por eso aca no se
+ * muestra ningun numero y ningun boton usa el dorado solido: en la pagina hay
+ * una sola accion principal, y es "Inscribirme".
+ */
 export function AsistenciaBotones({
   eventoId,
   inicial,
   autenticado,
-  confirmados,
 }: {
   eventoId: string;
   inicial: EstadoAsistencia | null;
   autenticado: boolean;
-  confirmados: number;
 }) {
   const [estado, setEstado] = useState<EstadoAsistencia | null>(inicial);
   const [pendiente, iniciar] = useTransition();
@@ -57,11 +63,11 @@ export function AsistenciaBotones({
           disabled={pendiente}
           aria-pressed={voy}
           className={cn(
-            "inline-flex h-11 items-center gap-2 rounded-full px-6 text-sm font-medium transition-all duration-300 ease-brand outline-none",
+            "inline-flex h-10 items-center gap-2 rounded-full border px-5 text-sm transition-colors outline-none",
             "focus-visible:ring-[3px] focus-visible:ring-gold-500/40 disabled:opacity-60",
             voy
-              ? "bg-gradient-to-b from-gold-400 to-gold-600 text-ink-950 shadow-gold"
-              : "border border-gold-500/50 text-gold-300 hover:border-gold-500 hover:bg-gold-500/10"
+              ? "border-gold-500/50 bg-gold-500/10 text-gold-300"
+              : "border-ink-700 text-cream-200 hover:bg-ink-800 hover:text-cream-50"
           )}
         >
           {pendiente ? (
@@ -69,7 +75,7 @@ export function AsistenciaBotones({
           ) : voy ? (
             <Check className="size-4" />
           ) : null}
-          {voy ? "Voy a ir" : "Confirmar asistencia"}
+          {voy ? "Pienso ir" : "Marcar que voy"}
         </button>
 
         <button
@@ -78,7 +84,7 @@ export function AsistenciaBotones({
           disabled={pendiente}
           aria-pressed={guardado}
           className={cn(
-            "inline-flex h-11 items-center gap-2 rounded-full border px-5 text-sm transition-colors outline-none",
+            "inline-flex h-10 items-center gap-2 rounded-full border px-5 text-sm transition-colors outline-none",
             "focus-visible:ring-[3px] focus-visible:ring-gold-500/40 disabled:opacity-60",
             guardado
               ? "border-ink-600 bg-ink-800 text-cream-50"
@@ -93,12 +99,8 @@ export function AsistenciaBotones({
       <p className="text-xs text-cream-400" aria-live="polite">
         {error ? (
           <span className="text-red-400">{error}</span>
-        ) : confirmados > 0 ? (
-          // "Marcaron que van" y no "confirmaron asistencia": el registro real
-          // es la inscripcion, que se muestra aparte con su propio conteo.
-          `${confirmados} ${confirmados === 1 ? "persona marcó" : "personas marcaron"} que va`
         ) : (
-          "Marca si piensas ir. Para asegurar tu cupo, inscríbete."
+          "Es solo para ti: guarda la fiesta o marca que piensas ir. Tu cupo lo reserva la inscripción."
         )}
       </p>
     </div>

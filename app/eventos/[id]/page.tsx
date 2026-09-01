@@ -8,7 +8,7 @@ import { AsistenciaBotones } from "@/components/site/asistencia-botones";
 import { ValoracionForm } from "@/components/site/valoracion-form";
 import { obtenerEvento } from "@/app/actions/eventos";
 import { contarInscritos } from "@/app/actions/inscripciones";
-import { obtenerAsistencia, contarAsistentes } from "@/app/actions/asistencias";
+import { obtenerAsistencia } from "@/app/actions/asistencias";
 import { miValoracion, puedeValorar, reputacionEvento } from "@/app/actions/valoraciones";
 import { fechaLarga } from "@/lib/formato-evento";
 import { createClient } from "@/lib/supabase/server";
@@ -40,11 +40,10 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
   } = await supabase.auth.getUser();
 
   // Consultas independientes: en paralelo.
-  const [inscritos, asistencia, asistentes, reputacion, valoracion, habilitado] =
+  const [conteo, asistencia, reputacion, valoracion, habilitado] =
     await Promise.all([
       contarInscritos(id),
       obtenerAsistencia(evento.id),
-      contarAsistentes(evento.id),
       reputacionEvento(evento.id),
       miValoracion(evento.id),
       puedeValorar(evento.id),
@@ -59,14 +58,13 @@ export default async function EventoPage({ params }: { params: Promise<{ id: str
       <main id="contenido" className="bg-ink-950 pb-20">
         <EventoDetalle
           evento={evento}
-          inscritos={inscritos}
+          conteo={conteo}
           reputacion={reputacion}
           asistencia={
             <AsistenciaBotones
               eventoId={evento.id}
               inicial={asistencia}
               autenticado={Boolean(user)}
-              confirmados={asistentes.confirmados}
             />
           }
           valoraciones={

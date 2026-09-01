@@ -2,11 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { CalendarDays, Clock, MapPin, Users, Ticket } from "lucide-react";
 import { MapaVista } from "@/components/site/mapa";
+import { GaleriaEvento } from "@/components/site/galeria-evento";
 import { Button } from "@/components/ui/button";
 import { EstrellasLectura } from "@/components/ui/estrellas";
 import type { Evento } from "@/app/actions/eventos";
+import type { Conteo } from "@/app/actions/inscripciones";
 import type { Reputacion } from "@/app/actions/valoraciones";
-import { fechaLarga, hora } from "@/lib/formato-evento";
+import { fechaLarga, horario } from "@/lib/formato-evento";
 import { hoyISO } from "@/lib/validation/eventos";
 import { CLP } from "@/lib/utils";
 
@@ -41,21 +43,23 @@ function Dato({
  */
 export function EventoDetalle({
   evento,
-  inscritos,
+  conteo,
   previsualizacion = false,
   reputacion,
   asistencia,
   valoraciones,
 }: {
   evento: Evento;
-  inscritos: number;
+  conteo: Conteo;
   previsualizacion?: boolean;
   reputacion?: Reputacion;
   asistencia?: React.ReactNode;
   valoraciones?: React.ReactNode;
 }) {
-  const termino = evento.fecha < hoyISO();
-  const disponibles = evento.capacidad != null ? evento.capacidad - inscritos : null;
+  // Vale la fecha de TERMINO: una fiesta de 22:00 a 04:00 sigue viva de madrugada.
+  const termino = evento.fecha_termino < hoyISO();
+  // Los cupos los descuenta quien tomo lugar, incluso si aun debe pagar.
+  const disponibles = evento.capacidad != null ? evento.capacidad - conteo.inscritos : null;
   const agotado = disponibles != null && disponibles <= 0;
 
   return (
@@ -97,7 +101,7 @@ export function EventoDetalle({
           <Dato
             icono={Clock}
             etiqueta="Horario"
-            valor={`${hora(evento.hora_inicio)} a ${hora(evento.hora_termino)} h`}
+            valor={horario(evento.fecha, evento.hora_inicio, evento.fecha_termino, evento.hora_termino)}
           />
           <Dato
             icono={Ticket}
@@ -115,7 +119,9 @@ export function EventoDetalle({
           />
         </div>
 
-        {/* Barra de inscripcion: el unico dorado solido de la pagina. */}
+        {/* Barra de inscripcion: el unico dorado solido de la pagina, y la que
+            lleva el conteo real de asistentes. La asistencia de mas abajo es
+            solo una senal de interes y no cuenta cabezas. */}
         <section className="flex flex-col items-center justify-between gap-5 rounded-[var(--radius-card)] bg-ink-900 p-6 shadow-soft sm:flex-row sm:p-8">
           <div className="text-center sm:text-left">
             <p className="font-display text-xl text-cream-50">
@@ -128,9 +134,19 @@ export function EventoDetalle({
                     : `Entrada ${CLP.format(evento.precio_clp)} por persona`}
             </p>
             <p className="mt-1.5 text-sm text-cream-400">
-              {termino || agotado
-                ? `${inscritos} ${inscritos === 1 ? "persona se inscribió" : "personas se inscribieron"}`
-                : "Reserva tu lugar en menos de un minuto."}
+              {conteo.confirmados > 0 ? (
+                <>
+                  <b className="text-cream-100">
+                    {conteo.confirmados}{" "}
+                    {conteo.confirmados === 1 ? "persona inscrita" : "personas inscritas"}
+                  </b>
+                  {!termino && !agotado && " · Reserva tu lugar en menos de un minuto."}
+                </>
+              ) : termino ? (
+                "Nadie se inscribió."
+              ) : (
+                "Sé la primera persona en inscribirse."
+              )}
             </p>
           </div>
 
@@ -150,7 +166,9 @@ export function EventoDetalle({
         </section>
 
         {asistencia && (
-          <div className="mt-6 rounded-card border border-ink-800 bg-ink-900 p-6">{asistencia}</div>
+          <div className="mt-4 rounded-card border border-ink-800 bg-ink-900/60 p-6">
+            {asistencia}
+          </div>
         )}
 
         {evento.descripcion && (
@@ -160,6 +178,16 @@ export function EventoDetalle({
             <p className="mt-6 text-sm leading-relaxed whitespace-pre-line text-cream-200">
               {evento.descripcion}
             </p>
+          </section>
+        )}
+
+        {evento.galeria_urls.length > 0 && (
+          <section className="mt-10">
+            <h2 className="font-display text-2xl text-cream-50">Galería</h2>
+            <div className="rule-gold mt-4 h-px w-16" aria-hidden />
+            <div className="mt-6">
+              <GaleriaEvento fotos={evento.galeria_urls} nombre={evento.nombre} />
+            </div>
           </section>
         )}
 

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import {
   eventoSchema,
   validarPortada,
+  validarGaleria,
   extensionDePortada,
 } from "@/lib/validation/eventos";
 import { createClient } from "@/lib/supabase/server";
@@ -31,12 +32,22 @@ export type EventoCard = {
 export type Evento = EventoCard & {
   owner_id: string;
   descripcion: string | null;
+  fecha_termino: string;
   hora_termino: string;
   lat: number;
   lng: number;
   capacidad: number | null;
   precio_clp: number;
+  galeria_urls: string[];
 };
+
+/**
+ * Columnas de la ficha completa; se piden igual en la vista publica y en la propia.
+ * Tiene que ser UN literal (sin concatenar): supabase-js deduce el tipo de la
+ * fila parseando este string, y con un `string` cualquiera pierde la inferencia.
+ */
+const COLUMNAS_EVENTO =
+  "id, owner_id, nombre, descripcion, fecha, hora_inicio, fecha_termino, hora_termino, lat, lng, direccion, portada_url, galeria_urls, capacidad, precio_clp" as const;
 
 /** Lee los campos del formulario, comunes al alta y a la edicion. */
 function leerFormulario(formData: FormData) {
@@ -45,6 +56,7 @@ function leerFormulario(formData: FormData) {
     descripcion: formData.get("descripcion") ?? "",
     fecha: formData.get("fecha") ?? "",
     horaInicio: formData.get("horaInicio") ?? "",
+    fechaTermino: formData.get("fechaTermino") ?? "",
     horaTermino: formData.get("horaTermino") ?? "",
     lat: formData.get("lat") ?? "",
     lng: formData.get("lng") ?? "",
@@ -63,6 +75,62 @@ function rutaDePortada(url: string): string | null {
   const marca = `/storage/v1/object/public/${BUCKET}/`;
   const i = url.indexOf(marca);
   return i === -1 ? null : decodeURIComponent(url.slice(i + marca.length));
+}
+
+/** Borra del bucket lo que ya no cuelga de ningun evento. Nunca hace fallar el guardado. */
+async function borrarDelBucket(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  urls: string[]
+) {
+  const rutas = urls.map(rutaDePortada).filter((r): r is string => r !== null);
+  if (rutas.length === 0) return;
+
+  const { error } = await supabase.storage.from(BUCKET).remove(rutas);
+  if (error) console.error("[eventos] no se pudieron borrar fotos:", error.message);
+}
+
+type SubidaGaleria = { urls: string[]; rutas: string[] } | { error: string };
+
+/** Sube las fotos secundarias. Si una falla, se limpian las que ya subieron. */
+async function subirGaleria(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  uid: string,
+  files: File[]
+): Promise<SubidaGaleria> {
+  const urls: string[] = [];
+  const rutas: string[] = [];
+
+  for (const file of files) {
+    const ruta = `${uid}/${crypto.randomUUID()}.${extensionDePortada(file.type)}`;
+    const { error } = await supabase.storage
+      .from(BUCKET)
+      .upload(ruta, file, { contentType: file.type });
+
+    if (error) {
+      if (rutas.length > 0) await supabase.storage.from(BUCKET).remove(rutas);
+      return { error: `No se pudo subir una foto de la galeria: ${error.message}` };
+    }
+
+    rutas.push(ruta);
+    urls.push(supabase.storage.from(BUCKET).getPublicUrl(ruta).data.publicUrl);
+  }
+
+  return { urls, rutas };
+}
+
+/** URLs de la galeria que el formulario pide conservar, filtradas contra las reales. */
+function galeriaConservada(formData: FormData, actuales: string[]): string[] {
+  const crudo = formData.get("galeriaConservar");
+  if (typeof crudo !== "string") return actuales;
+
+  try {
+    const pedidas = JSON.parse(crudo);
+    if (!Array.isArray(pedidas)) return actuales;
+    // Solo pueden sobrevivir URLs que ya estaban: el cliente no agrega por aca.
+    return actuales.filter((url) => pedidas.includes(url));
+  } catch {
+    return actuales;
+  }
 }
 
 export async function crearEventoAction(
@@ -95,6 +163,11 @@ export async function crearEventoAction(
     return { ok: false, error: portada.error, fieldErrors: { portada: [portada.error] } };
   }
 
+  const galeria = validarGaleria(formData.getAll("galeria"));
+  if ("error" in galeria) {
+    return { ok: false, error: galeria.error, fieldErrors: { galeria: [galeria.error] } };
+  }
+
   const d = parsed.data;
   const ruta = `${auth.user.id}/${crypto.randomUUID()}.${extensionDePortada(portada.file.type)}`;
 
@@ -108,6 +181,12 @@ export async function crearEventoAction(
 
   const { data: publicUrl } = supabase.storage.from(BUCKET).getPublicUrl(ruta);
 
+  const secundarias = await subirGaleria(supabase, auth.user.id, galeria.files);
+  if ("error" in secundarias) {
+    await supabase.storage.from(BUCKET).remove([ruta]);
+    return { ok: false, error: secundarias.error, fieldErrors: { galeria: [secundarias.error] } };
+  }
+
   const { data: creado, error } = await supabase
     .from("eventos")
     .insert({
@@ -116,12 +195,14 @@ export async function crearEventoAction(
       descripcion: d.descripcion || null,
       fecha: d.fecha,
       hora_inicio: d.horaInicio,
+      fecha_termino: d.fechaTermino,
       hora_termino: d.horaTermino,
       lat: d.lat,
       lng: d.lng,
       ubicacion: `SRID=4326;POINT(${d.lng} ${d.lat})`,
       direccion: d.direccion || null,
       portada_url: publicUrl.publicUrl,
+      galeria_urls: secundarias.urls,
       capacidad: d.sinLimiteCapacidad ? null : d.capacidad,
       precio_clp: d.precioClp,
     })
@@ -129,7 +210,7 @@ export async function crearEventoAction(
     .single();
 
   if (error) {
-    await supabase.storage.from(BUCKET).remove([ruta]);
+    await supabase.storage.from(BUCKET).remove([ruta, ...secundarias.rutas]);
     return { ok: false, error: `No se pudo crear el evento: ${error.message}` };
   }
 
@@ -144,7 +225,7 @@ export async function listarEventosProximos(limite = 8): Promise<EventoCard[]> {
     const { data, error } = await supabase
       .from("eventos")
       .select("id, nombre, fecha, hora_inicio, direccion, portada_url, precio_clp")
-      .gte("fecha", new Date().toLocaleDateString("en-CA"))
+      .gte("fecha_termino", new Date().toLocaleDateString("en-CA"))
       .order("fecha", { ascending: true })
       .order("hora_inicio", { ascending: true })
       .limit(limite);
@@ -164,7 +245,7 @@ export async function obtenerEvento(id: string): Promise<Evento | null> {
   const { data, error } = await supabase
     .from("eventos")
     .select(
-      "id, owner_id, nombre, descripcion, fecha, hora_inicio, hora_termino, lat, lng, direccion, portada_url, capacidad, precio_clp"
+      COLUMNAS_EVENTO
     )
     .eq("id", id)
     .maybeSingle();
@@ -188,7 +269,7 @@ export async function obtenerEventoPropio(id: string): Promise<Evento | null> {
   const { data, error } = await supabase
     .from("eventos")
     .select(
-      "id, owner_id, nombre, descripcion, fecha, hora_inicio, hora_termino, lat, lng, direccion, portada_url, capacidad, precio_clp"
+      COLUMNAS_EVENTO
     )
     .eq("id", id)
     .eq("owner_id", user.id)
@@ -213,7 +294,7 @@ export async function editarEventoAction(
 
   const { data: actual } = await supabase
     .from("eventos")
-    .select("id, portada_url")
+    .select("id, portada_url, galeria_urls")
     .eq("id", id)
     .eq("owner_id", auth.user.id)
     .maybeSingle();
@@ -227,6 +308,12 @@ export async function editarEventoAction(
       error: "Revisa los datos del formulario.",
       fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
     };
+  }
+
+  const conservadas = galeriaConservada(formData, actual.galeria_urls ?? []);
+  const galeria = validarGaleria(formData.getAll("galeria"), conservadas.length);
+  if ("error" in galeria) {
+    return { ok: false, error: galeria.error, fieldErrors: { galeria: [galeria.error] } };
   }
 
   // La foto es opcional al editar: si no suben una nueva, se conserva la actual.
@@ -252,6 +339,12 @@ export async function editarEventoAction(
     portadaUrl = supabase.storage.from(BUCKET).getPublicUrl(rutaNueva).data.publicUrl;
   }
 
+  const secundarias = await subirGaleria(supabase, auth.user.id, galeria.files);
+  if ("error" in secundarias) {
+    if (rutaNueva) await supabase.storage.from(BUCKET).remove([rutaNueva]);
+    return { ok: false, error: secundarias.error, fieldErrors: { galeria: [secundarias.error] } };
+  }
+
   const d = parsed.data;
   const { error } = await supabase
     .from("eventos")
@@ -260,27 +353,32 @@ export async function editarEventoAction(
       descripcion: d.descripcion || null,
       fecha: d.fecha,
       hora_inicio: d.horaInicio,
+      fecha_termino: d.fechaTermino,
       hora_termino: d.horaTermino,
       lat: d.lat,
       lng: d.lng,
       ubicacion: `SRID=4326;POINT(${d.lng} ${d.lat})`,
       direccion: d.direccion || null,
       portada_url: portadaUrl,
+      galeria_urls: [...conservadas, ...secundarias.urls],
       capacidad: d.sinLimiteCapacidad ? null : d.capacidad,
       precio_clp: d.precioClp,
     })
     .eq("id", id);
 
   if (error) {
-    if (rutaNueva) await supabase.storage.from(BUCKET).remove([rutaNueva]);
+    const aLimpiar = [...secundarias.rutas];
+    if (rutaNueva) aLimpiar.push(rutaNueva);
+    if (aLimpiar.length > 0) await supabase.storage.from(BUCKET).remove(aLimpiar);
     return { ok: false, error: `No se pudo guardar el evento: ${error.message}` };
   }
 
-  // Recien con el update confirmado se descarta la foto anterior.
-  if (rutaNueva) {
-    const vieja = rutaDePortada(actual.portada_url);
-    if (vieja) await supabase.storage.from(BUCKET).remove([vieja]);
-  }
+  // Recien con el update confirmado se descartan las fotos que quedaron sueltas.
+  const descartadas = (actual.galeria_urls ?? []).filter(
+    (url: string) => !conservadas.includes(url)
+  );
+  if (rutaNueva) descartadas.push(actual.portada_url);
+  await borrarDelBucket(supabase, descartadas);
 
   revalidatePath("/");
   revalidatePath(`/eventos/${id}`);
@@ -303,7 +401,7 @@ export async function eliminarEventoAction(
 
   const { data: evento } = await supabase
     .from("eventos")
-    .select("id, nombre, portada_url")
+    .select("id, nombre, portada_url, galeria_urls")
     .eq("id", id)
     .eq("owner_id", auth.user.id)
     .maybeSingle();
@@ -326,8 +424,9 @@ export async function eliminarEventoAction(
   const { error } = await supabase.from("eventos").delete().eq("id", id);
   if (error) return { ok: false, error: `No se pudo eliminar el evento: ${error.message}` };
 
-  const ruta = rutaDePortada(evento.portada_url);
-  if (ruta) await supabase.storage.from(BUCKET).remove([ruta]);
+  // La fila ya no existe: si el borrado del bucket falla, quedan huerfanas,
+  // no se puede revertir. Por eso va despues y no hace fallar la accion.
+  await borrarDelBucket(supabase, [evento.portada_url, ...(evento.galeria_urls ?? [])]);
 
   revalidatePath("/");
   revalidatePath("/mis-eventos");
